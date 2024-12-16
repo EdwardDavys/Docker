@@ -1,0 +1,39 @@
+# DOCKER SHEET PROYECTO DOCKER GALAXY
+
+#DESCARGAR IMAGEN DE MYSQL
+docker pull mysql:9.0
+#CREAR CONTENEDOR MYSQL
+docker run --name mysql-galaxy -p 3306:3306 -e MYSQL_ROOT_PASSWORD=123 -d mysql:9.0
+#INGRESAR AL CONTENEDOR DE MYSQL
+docker exec -it mysql-galaxy bash
+
+#DESCARGAR IAMGEN DE MONGO
+docker pull mongo:8.0
+
+#CREAR CONTENEDOR DE MONGO
+docker run --name mongo-galaxy -p 27017:27017 -d mongo:8.0
+#INGRESAR AL CONTENEDOR DE MONGO
+docker exec -it mongo-galaxy mongosh
+#LOGUEO
+ use admin
+ db.auth("david","david123")
+ #USAR BASE DE DATOS CURSOS
+ use cursos
+#PARA MOSTRAR LAS COLECCIONES
+show collections
+
+#PARA VER EL CONTENIDO DE LAS CONEXIONES
+db.curso_collection.find().pretty()
+
+#CREAR IMAGEN DE API MASCOTA
+docker build -t david0811/api-mascota-proyecto:1.0 .
+#CREAR IMAGEN DE API CURSO
+docker build -t david0811/api-curso-proyecto:1.0 .
+
+#ENVIAR IMAGEN A DOCKER HUB
+docker push david0811/api-curso-proyecto:1.0
+docker push david0811/api-mascota-proyecto:1.0
+
+
+
+

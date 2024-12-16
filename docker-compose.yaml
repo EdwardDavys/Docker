@@ -1,0 +1,102 @@
+name: apis-proyecto-galaxy
+
+services:
+ # Database service mysql
+  db_mysql:
+    container_name: db_mysql
+    image: mysql:9.0
+    restart: always
+    volumes:
+      - mysql-data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: 123
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -p123"]
+      timeout: 10s
+      retries: 10
+    networks:
+     - red_proyecto_galaxy
+
+  # Database service mongo
+  mongo_db:
+    image:  mongo:8.0  
+    container_name: mongo_db
+    ports:
+      - "27017:27017"  
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: david  
+      MONGO_INITDB_ROOT_PASSWORD: david123  
+      MONGO_INITDB_DATABASE: cursos  
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.runCommand({ ping: 1 })"]
+      timeout: 5s
+      retries: 5    
+    networks:
+      - red_proyecto_galaxy     
+
+  # API Mascota
+  api_mascota:
+    container_name: api_mascota
+    image: david0811/api-mascota-proyecto:1.0
+    restart: on-failure
+    ports:
+      - "8081:8080"
+    environment:
+      MYSQL_HOST: db_mysql
+      MYSQL_USER: root
+      MYSQL_PASSWORD: 123
+      MYSQL_PORT: 3306
+      MYSQL_DB: mascota
+    depends_on:
+      db_mysql:
+        condition: service_healthy
+    networks:
+     - red_proyecto_galaxy 
+
+  # API Curso
+  api_curso:
+    container_name: api_curso
+    image: david0811/api-curso-proyecto:1.0
+    restart: on-failure
+    ports:
+      - "8082:8080"
+    environment:
+      MONGO_USER: david  
+      MONGO_PASSWORD: david123  
+      MONGO_HOST: mongo_db  
+      MONGO_PORT: 27017  
+      MONGO_DB: cursos  
+    depends_on:
+      mongo_db:
+        condition: service_healthy
+    networks:
+     - red_proyecto_galaxy
+
+  # API Curso
+  api_curso_2:
+    container_name: api_curso_2
+    image: david0811/api-curso-proyecto:1.0
+    restart: on-failure
+    ports:
+      - "8083:8080"
+    environment:
+      MONGO_USER: david  
+      MONGO_PASSWORD: david123  
+      MONGO_HOST: mongo_db  
+      MONGO_PORT: 27017  
+      MONGO_DB: cursos2  
+    depends_on:
+      mongo_db:
+        condition: service_healthy
+    networks:
+     - red_proyecto_galaxy                
+
+volumes:
+  mysql-data:
+  mongo-data:
+networks:
+  red_proyecto_galaxy:  
